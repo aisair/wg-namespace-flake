@@ -55,7 +55,7 @@ in
           # Dump the data
           # Assume that the interface has a single address. If this assumption does not
           # hold, this will need to be marshalled through an array of some sort
-          ADDR=$(ip --json addr show dev mullvad | jq --raw-output '.[].addr_info[] | select(.family=="inet") | .local')
+          ADDR=$(ip --json addr show dev ''${IFACE_NAME} | jq --raw-output '.[].addr_info[] | select(.family=="inet") | .local')
 
           ip netns add "''${NAMESPACE_NAME}"
           ip link set "''${IFACE_NAME}" netns "''${NAMESPACE_NAME}"
