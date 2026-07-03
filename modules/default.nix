@@ -63,6 +63,8 @@ in
           # Manipulate the interface in the namespace
           ip -netns "''${NAMESPACE_NAME}" addr add "$ADDR" dev "''${IFACE_NAME}"
           ip -netns "''${NAMESPACE_NAME}" link set up dev "''${IFACE_NAME}"
+          # Also bring the loopback interface in the namespace up
+          ip -netns "''${NAMESPACE_NAME}" link set up dev lo
           # Assume all traffic should go through the interface
           ip -netns "''${NAMESPACE_NAME}" route add default dev "''${IFACE_NAME}"
           ip netns exec "''${NAMESPACE_NAME}" ${lib.getExe pkgs.nftables} --file ${firewallRules}
