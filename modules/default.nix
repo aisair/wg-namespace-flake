@@ -55,18 +55,23 @@ in
           # Dump the data
           # Assume that the interface has a single address. If this assumption does not
           # hold, this will need to be marshalled through an array of some sort
-          ADDR=$(ip --json addr show dev ''${IFACE_NAME} | jq --raw-output '.[].addr_info[] | select(.family=="inet") | .local')
+          DEVJSON=$(ip --json addr show dev ''${IFACE_NAME})
+          ADDR=$(echo $DEVJSON | jq --raw-output '.[].addr_info[] | select(.family=="inet") | .local')
+          ADDR6=$(echo $DEVJSON | jq --raw-output '.[].addr_info[] | select(.family=="inet6") | .local')
 
           ip netns add "''${NAMESPACE_NAME}"
           ip link set "''${IFACE_NAME}" netns "''${NAMESPACE_NAME}"
 
           # Manipulate the interface in the namespace
           ip -netns "''${NAMESPACE_NAME}" addr add "$ADDR" dev "''${IFACE_NAME}"
+          [ -n "$ADDR6" ] && ip -netns "''${NAMESPACE_NAME}" -6 addr add "$ADDR6" dev "''${IFACE_NAME}"
+          # Bring the wireguard interface in the namespace up
           ip -netns "''${NAMESPACE_NAME}" link set up dev "''${IFACE_NAME}"
           # Also bring the loopback interface in the namespace up
           ip -netns "''${NAMESPACE_NAME}" link set up dev lo
           # Assume all traffic should go through the interface
           ip -netns "''${NAMESPACE_NAME}" route add default dev "''${IFACE_NAME}"
+          [ -n "$ADDR6" ] && ip -netns "''${NAMESPACE_NAME}" -6 route add default dev "''${IFACE_NAME}"
           ip netns exec "''${NAMESPACE_NAME}" ${lib.getExe pkgs.nftables} --file ${firewallRules}
         '';
       path = [
