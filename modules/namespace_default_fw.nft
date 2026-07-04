@@ -15,6 +15,9 @@ table inet my_table {
         meta l4proto icmp accept comment "Accept ICMP"
         ip protocol igmp accept comment "Accept IGMP"
 
+        tcp dport 38984 accept
+        udp dport 38984 accept
+
         counter comment "Count any other traffic"
     }
 
