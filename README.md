@@ -12,10 +12,6 @@ sh-5.1$ curl ifconfig.co
 Y.Y.Y.Y
 ```
 
-# TODO
-
-- Add ipv6 support
-
 # Usage
 
 1. Configure a WireGuard adapter, e.g. using [`systemd-networkd`][wiki].
